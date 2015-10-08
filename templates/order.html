@@ -20,7 +20,7 @@ Pusher.log = function(message) {
 var pusher = new Pusher('15320f539698c1e5499e', {
   encrypted: true
 });
-var channel = pusher.subscribe('hi');
+var channel = pusher.subscribe('{{channel}}');
 channel.bind('notify', function(data) {
   $('.content').append('<div class="alert alert-success" role="alert">' + data.message + '</div>');
 });
