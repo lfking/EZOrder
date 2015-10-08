@@ -1,3 +1,5 @@
+
+
 jQuery("#webcam").webcam({
 
     width: 320,
@@ -23,6 +25,7 @@ jQuery("#webcam").webcam({
     onCapture: function () {
         webcam.save();
 
+
       // Show a flash for example
     },
 
@@ -36,5 +39,6 @@ jQuery("#webcam").webcam({
         for(var i in cams) {
             jQuery("#cams").append("<li>" + cams[i] + "</li>");
         }
+
     }
 });
