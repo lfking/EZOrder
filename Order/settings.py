@@ -19,8 +19,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '1u_t14y2f9xj6r6#j5vk(#eotu2@1f8(26=-3e^4m7us_(r(hc'
+try:
+    from secrets import *
+except ImportError:
+    raise Exception("You need to copy secrets.example.py as secrets.py and change the values")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -30,15 +32,19 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = (
+DEFAULT_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ezorder',
 )
+THIRD_PARTY_APPS = ('background_task',)
+if DEBUG:
+    THIRD_PARTY_APPS += ('debug_toolbar',)
+LOCAL_APPS = ('ezorder',)
+INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

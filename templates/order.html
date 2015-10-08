@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <h1 class="cover-heading">Order Complete <span class="glyphicon glyphicon-transfer"></span></h1>
+  <p class="lead">Wait on this page and we'll notify you on shipment progress</p>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://js.pusher.com/3.0/pusher.min.js"></script>
+<script>
+// Enable pusher logging - don't include this in production
+Pusher.log = function(message) {
+  if (window.console && window.console.log) {
+    window.console.log(message);
+  }
+};
+
+var pusher = new Pusher('15320f539698c1e5499e', {
+  encrypted: true
+});
+var channel = pusher.subscribe('{{channel}}');
+channel.bind('notify', function(data) {
+  $('.inner.cover').append('<div class="alert alert-success" role="alert">' + data.message + '</div>');
+});
+</script>
+{% endblock %}
