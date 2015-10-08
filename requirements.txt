@@ -1,2 +1,1 @@
 Django==1.8.5
-asprise-ocr-sdk-python-api==15.3.0.8
