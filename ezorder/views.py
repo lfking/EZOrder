@@ -52,8 +52,7 @@ def shopping_list(request):
   {
     'selected': True,
     'brands': [
-         {'name': 'Tomatos', 'quantity': 2, 'unit_weight': 0.5, 'weight_unit': 'kg', 'price': 500},
-         {'name': 'Organic Tomatos', 'quantity': 5, 'unit_weight': 0.2, 'weight_unit': 'kg', 'price': 200}
+         {'name': 'tomatoes by weight', 'quantity': 2, 'unit_weight': 0.5, 'weight_unit': 'kg', 'price': 500},
     ],
   },
   {
@@ -78,15 +77,19 @@ def order(request):
     return render(request, 'order.html', {'channel': channel})
 
 
-#@require_POST
+@require_POST
+@csrf_exempt
 def pay(request):
-    return render(request, 'pay.html')
+    data = json.loads(request.POST['data'])
+    cents = parse_ingredients.get_price(data)
+    return render(request, 'pay.html', {'price': "%s.%s" % (cents / 100, cents % 100) })
 
 @require_POST
 def create_purchase(request):
     nonce = request.POST["payment_method_nonce"].encode('utf8')
+    price = request.POST["amount"].encode('utf8')
     result = braintree.Transaction.sale({
-        "amount": "10.00",
+        "amount": price,
         "payment_method_nonce": nonce
     })
     assert result.is_success

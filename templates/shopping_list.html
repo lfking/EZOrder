@@ -18,11 +18,14 @@
       <th>Price</th>
   </thead>
 </table>
+<form hidden=hidden method="POST" action="{% url "pay" %}" class="hidden-form">
+    <input type="hidden" name="data">
+</form>
     </div>
 {% endblock %}
 
 {% block footend %}
-<button type="button" class="btn btn-success btn-block">Continue</button>
+<button type="button" class="btn btn-success btn-block" onclick="send()">Continue</button>
 {% endblock %}
 {% block scripts %}
 
@@ -90,6 +93,14 @@ var enabledList = $('#shopping-list-enabled');
 var disabledList= $('#shopping-list-disabled');
 for(var i = 0; i < json.length; i++) {
     addRow(json[i]);
+}
+
+function send() {
+    var t = $('#shopping-list-enabled tbody tr').map(function(i, tr) {
+        return {product: $('select', tr).val(), quantity: +$('.quantity input', tr).val()};
+    });
+    $('.hidden-form input').val(JSON.stringify(t.get()));
+    $('.hidden-form').submit();
 }
 </script>
 {% endblock %}
