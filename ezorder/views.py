@@ -1,10 +1,13 @@
 import os
 import json
+import tempfile
 from django.http import HttpResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from ezorder import tasks
+import parse_ingredients
+from ocr import ocr_image
 
 import braintree
 
@@ -23,7 +26,18 @@ def get_index(request):
 @require_POST
 @csrf_exempt
 def ocr(request):
-    return HttpResponse('response')
+    assert 'webcam' in request.FILES
+    fd, path = tempfile.mkstemp('.jpg')
+    f = os.fdopen(fd, 'wb')
+    try:
+        for chunk in request.FILES['webcam'].chunks():
+            f.write(chunk)
+        f.close()
+        recipe_text = ocr_image(path)
+    finally:
+        os.remove(path)
+    items = parse_ingredients.parse(recipe_text)
+    return JsonResponse(items)
 
 @require_GET
 def shopping_list(request):

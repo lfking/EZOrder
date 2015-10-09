@@ -16,9 +16,9 @@ class OCRSettings(ProcessingSettings):
     Profile = "documentConversion"
     OutputFormat = "txt" # rtf,xml
 
-def ocr_image(file_handle):
+def ocr_image(path):
     processor = get_ocr()
-    task = processor.ProcessImageFile(file_handle, OCRSettings)
+    task = processor.ProcessImage(path, OCRSettings)
     assert task is not None
     while task.IsActive() == True :
         time.sleep(2)
