@@ -5,7 +5,8 @@
 <form id="checkout" method="post" action="/ezorder/checkout/">
 
   <div id="payment-form">{% csrf_token %}</div>
-  <input type="submit" value="Pay ${{price}}">
+    <input type="hidden" name="amount" value="{{price}}">
+    <input type="submit" value="Pay ${{price}}">
 </form>
     </div>
 {% endblock %}

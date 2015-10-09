@@ -97,7 +97,7 @@ for(var i = 0; i < json.length; i++) {
 
 function send() {
     var t = $('#shopping-list-enabled tbody tr').map(function(i, tr) {
-        return {product: $('select', tr).val(), quantity: $('.quantity input', tr).val()};
+        return {product: $('select', tr).val(), quantity: +$('.quantity input', tr).val()};
     });
     $('.hidden-form input').val(JSON.stringify(t.get()));
     $('.hidden-form').submit();
