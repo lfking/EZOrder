@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
-
-<table id="shopping-list-enabled" class="table table-hover shopping-list">
+<div class="after-header">
+<table id="shopping-list-enabled" class="table table-responsive shopping-list">
   <thead>
       <th>✓</th>
       <th>Quantity</th>
@@ -16,8 +16,12 @@
       <th>Name</th>
   </thead>
 </table>
+    </div>
 {% endblock %}
 
+{% block footend %}
+<button type="button" class="btn btn-success btn-block">Continue</button>
+{% endblock %}
 {% block scripts %}
 
 <script>
@@ -73,6 +77,7 @@ function addRow(rowData) {
         enabledList.append(row);
     } else {
         disabledList.append(row);
+        row.addClass("danger")
     }
 }
 
