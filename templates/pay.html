@@ -6,7 +6,7 @@
 
   <div id="payment-form">{% csrf_token %}</div>
     <input type="hidden" name="amount" value="{{price}}">
-    <input type="submit" value="Pay ${{price}}">
+    <input class="btn btn-primary" type="submit" value="Pay ${{price}}">
 </form>
     </div>
 {% endblock %}
