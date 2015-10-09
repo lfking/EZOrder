@@ -7,6 +7,7 @@
       <th>✓</th>
       <th>Quantity</th>
       <th>Name</th>
+      <th>Price</th>
   </thead>
 </table>
 <table id="shopping-list-disabled" class="table table-hover shopping-list">
@@ -14,6 +15,7 @@
       <th>✓</th>
       <th>Quantity</th>
       <th>Name</th>
+      <th>Price</th>
   </thead>
 </table>
     </div>
@@ -39,7 +41,8 @@ function addRow(rowData) {
                             var el = $(el);
                             o.brands.push({
                                 name: el.val(),
-                                quantity: el.data('quantity')
+                                quantity: el.data('quantity'),
+                                price: el.data('price')
                             });
                         });
                         tr.remove();
@@ -52,14 +55,15 @@ function addRow(rowData) {
     for(var j = 0; j < rowData.brands.length; j++) {
         var quantity = rowData.brands[j].quantity;
         var name = rowData.brands[j].name;
+        var price = rowData.brands[j].price;
         var option = $('<option>')
-                .val(name).data('quantity', quantity).text(name);
+                .val(name).data('quantity', quantity).text(name).data('price', price);
         brands.append(option);
     }
     brands.on('focus', function(e) {
         $('option', e.target).each(function(i, el) {
             el = $(el);
-            el.text(el.data('quantity') + 'x ' + el.val());
+            el.text(el.data('quantity') + 'x ' + el.val() + ' - ' + el.data('price') + ' cents');
         });
     }).on('blur', function(e) {
         $('option', e.target).each(function(i, el) {

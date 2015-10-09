@@ -1,10 +1,17 @@
 import os
 import json
 from django.http import HttpResponse
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, redirect
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from ezorder import tasks
+
+import braintree
+
+braintree.Configuration.configure(braintree.Environment.Sandbox,
+                                  merchant_id="9rqw2d8p69gj79hc",
+                                  public_key="zxvcz8gyj7t4rz99",
+                                  private_key="bb48c79b6a076781ff6aa6c1afad45f0")
 
 @require_GET
 def get_index(request):
@@ -24,22 +31,22 @@ def shopping_list(request):
   {
     'selected': True,
     'brands': [
-         {'name': '1L Olivia olive oil', 'quantity': 2, 'weight_unit': None},
-         {'name': '2L Tnuva olive oil', 'quantity': 1, 'weight_unit': None},
+         {'name': '1L Olivia olive oil', 'quantity': 2, 'weight_unit': None, 'price': 1000},
+         {'name': '2L Tnuva olive oil', 'quantity': 1, 'weight_unit': None,'price': 1200},
     ],
   },
   {
     'selected': True,
     'brands': [
-         {'name': 'Tomatos', 'quantity': 2, 'unit_weight': 0.5, 'weight_unit': 'kg'},
-         {'name': 'Organic Tomatos', 'quantity': 5, 'unit_weight': 0.2, 'weight_unit': 'kg'}
+         {'name': 'Tomatos', 'quantity': 2, 'unit_weight': 0.5, 'weight_unit': 'kg', 'price': 500},
+         {'name': 'Organic Tomatos', 'quantity': 5, 'unit_weight': 0.2, 'weight_unit': 'kg', 'price': 200}
     ],
   },
   {
     'selected': False,
     'brands': [
-         {'name': '500g Kosher Salt', 'quantity': 1, 'weight_unit': None},
-         {'name': '2L Tnuva olive oil', 'quantity': 1, 'weight_unit': None}
+         {'name': '500g Kosher Salt', 'quantity': 1, 'weight_unit': None, 'price': 6200},
+         {'name': '2L Tnuva olive oil', 'quantity': 1, 'weight_unit': None, 'price': 5800}
     ],
   }
 ]
@@ -50,8 +57,28 @@ def shopping_list(request):
         'items': data,
     })
 
-#@require_POST
+@require_GET
 def order(request):
     channel = os.urandom(16).encode('hex')
     t = tasks.track_order(channel)
     return render(request, 'order.html', {'channel': channel})
+
+
+#@require_POST
+def pay(request):
+    return render(request, 'pay.html')
+
+@require_POST
+def create_purchase(request):
+    nonce = request.POST["payment_method_nonce"].encode('utf8')
+    result = braintree.Transaction.sale({
+        "amount": "10.00",
+        "payment_method_nonce": nonce
+    })
+    assert result.is_success
+    return redirect('order')
+
+@require_GET
+def client_token(request):
+    print 'hey'
+    return HttpResponse(braintree.ClientToken.generate())
