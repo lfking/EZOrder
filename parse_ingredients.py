@@ -14,7 +14,7 @@ food_type_data = [
         'unitless':200
         }, [
             ('100g osem tomato sauce', 120, 100, 'g'),
-            ('200g osem tomato sauce    ', 200, 200, 'g')
+            ('200g osem tomato sauce', 200, 200, 'g')
         ]
     ),
     (['egg', 'eggs'], False, False, 'unitless', {}, [
@@ -220,7 +220,16 @@ def parse(ingredients_list):
 
 
 def get_price(product_list):
-    pass
+    price = 0
+    for product in product_list:
+        for food_type in food_types:
+            for db_product in food_type['products']:
+                if product["brand"] == db_product["name"]:
+                    price += product["quantity"] * db_product["price"]
+                    break
+    return price
+assert get_price([{"brand" : '200g osem tomato sauce', "quantity" : 2}, {"brand" : '1L white wine', "quantity" : 3}]) == 6400
+
 
 
 def get_product_details(line):
