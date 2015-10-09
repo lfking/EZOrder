@@ -2,4 +2,85 @@
 {% load staticfiles %}
 {% block content %}
 
+<table id="shopping-list-enabled" class="table table-hover shopping-list">
+  <thead>
+      <th>✓</th>
+      <th>Quantity</th>
+      <th>Name</th>
+  </thead>
+</table>
+<table id="shopping-list-disabled" class="table table-hover shopping-list">
+  <thead>
+      <th>✓</th>
+      <th>Quantity</th>
+      <th>Name</th>
+  </thead>
+</table>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+function addRow(rowData) {
+    var row = $('<tr>');
+    row.append($('<td>').addClass('selected').append(
+            $('<input>').attr('type', 'checkbox').prop('checked', rowData.selected)
+                    .change(function(e) {
+                        var tr = $(e.target).parents('tr');
+                        var o = {
+                            selected: $('input[type=checkbox]', tr).is(':checked'),
+                            brands: []
+                        };
+                        $('option', tr).each(function(i, el) {
+                            var el = $(el);
+                            o.brands.push({
+                                name: el.val(),
+                                quantity: el.data('quantity')
+                            });
+                        });
+                        tr.remove();
+                        addRow(o);
+                    })));
+    row.append($('<td>').addClass('quantity').append(
+            $('<input>').attr('type', 'number').val(rowData.brands[0].quantity)));
+
+    var brands = $('<select>');
+    for(var j = 0; j < rowData.brands.length; j++) {
+        var quantity = rowData.brands[j].quantity;
+        var name = rowData.brands[j].name;
+        var option = $('<option>')
+                .val(name).data('quantity', quantity).text(name);
+        brands.append(option);
+    }
+    brands.on('focus', function(e) {
+        $('option', e.target).each(function(i, el) {
+            el = $(el);
+            el.text(el.data('quantity') + 'x ' + el.val());
+        });
+    }).on('blur', function(e) {
+        $('option', e.target).each(function(i, el) {
+            el = $(el);
+            el.text(el.val());
+        });
+    }).on('change', function(e) {
+        var el = $(e.target);
+        $('.quantity input', el.parents('tr')).val($('option:selected', el).data('quantity'));
+        el.blur();
+    });
+
+    row.append($('<td>').append(brands));
+    if (rowData.selected) {
+        enabledList.append(row);
+    } else {
+        disabledList.append(row);
+    }
+}
+
+var json = JSON.parse('{{ items|safe }}');
+var enabledList = $('#shopping-list-enabled');
+var disabledList= $('#shopping-list-disabled');
+for(var i = 0; i < json.length; i++) {
+    addRow(json[i]);
+}
+</script>
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
+<div class="center-block" style="text-align: center">
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -34,5 +35,10 @@
             <p class="lead">
               <a data-toggle="modal" data-target="#myModal" class="btn btn-lg btn-default">Try it now</a>
             </p>
+</div>
+{% endblock %}
 
+{% block scripts %}
+    <script src="{% static "jquery-webcam/jquery.webcam.min.js" %}"></script>
+    <script src="{% static "js/webcams.js" %}"></script>
 {% endblock %}

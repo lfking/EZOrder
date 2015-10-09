@@ -11,7 +11,7 @@
   border-style: dashed;
   border-color: #ccc;
   line-height: 200px;
-  text-align: center
+  text-align: left;
 }
 .upload-drop-zone.drop {
   color: #222;

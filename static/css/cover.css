@@ -16,7 +16,7 @@ body {
 }
 body {
   color: #aaa;
-  text-align: center;
+  text-align: left;
   text-shadow: 0 1px 3px rgba(0,0,0,.5);
 }
 
@@ -145,4 +145,18 @@ body {
   .cover-container {
     width: 700px;
   }
+}
+
+.shopping-list .selected,
+.shopping-list .quantity {
+  width: 1px;
+}
+
+.shopping-list .quantity input {
+    width: 2em;
+}
+
+.shopping-list select {
+  background: none;
+  width: 100%;
 }

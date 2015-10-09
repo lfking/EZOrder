@@ -23,15 +23,9 @@
 
 
 
-<div class="site-wrapper">
+<div class="container-fluid">
 
-      <div class="site-wrapper-inner">
-
-        <div class="cover-container">
-
-          <div class="masthead clearfix">
-            <div class="inner">
-<h3 class="masthead-brand">EZOrder</h3>
+    <h3 class="masthead-brand">EZOrder</h3>
               <nav>
                 <ul class="nav masthead-nav">
                   <li {% if selected_nav == "index" %}
@@ -41,27 +35,19 @@
                   <li {% if selected_nav == "shop" %}
                           class="active"
                       {% endif %}
-                          ><a href="{% url "shopping-list" %}"><span class="glyphicon glyphicon-picture"></span> Upload Picture</a></li>
+                          ><a href="{% url "shopping-list" %}"><span class="glyphicon glyphicon-picture"></span> Shopping List</a></li>
                   <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Log In</a></li>
                 </ul>
               </nav>
             </div>
-          </div>
-            <div class="inner cover">
+            <div class="content">
             {% block content %} {% endblock %}
             </div>
 
           <div class="mastfoot">
-            <div class="inner">
-              <p>EZOrder inc.</p>
-            </div>
+            <p>EZOrder inc.</p>
           </div>
 
-        </div>
-
-      </div>
-
-    </div>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -69,7 +55,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="{% static "js/bootstrap.min.js" %}"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
-    <script src="{% static "jquery-webcam/jquery.webcam.min.js" %}"></script>
-    <script src="{% static "js/webcams.js" %}"></script>
+
+{% block scripts %} {% endblock %}
 </body>
 </html>
