@@ -17,11 +17,11 @@ food_type_data = [
             ('200g osem tomato sauce    ', 200, 200, 'g')
         ]
     ),
-    (['egg', 'eggs'], False, False, 'carton', {}, [
-            ('6 pack free range eggs', 1500, 6, ''),
-            ('12 pack free range eggs', 2000, 12, ''),
-            ('6 pack eggs', 1000, 6, ''),
-            ('12 pack eggs', 1600, 12, '')
+    (['egg', 'eggs'], False, False, 'unitless', {}, [
+            ('6 pack free range eggs', 1500, 6, 'unitless'),
+            ('12 pack free range eggs', 2000, 12, 'unitless'),
+            ('6 pack eggs', 1000, 6, 'unitless'),
+            ('12 pack eggs', 1600, 12, 'unitless')
         ]
     ),
     (['flour'], False, False, 'g', {
@@ -169,10 +169,10 @@ food_type = lambda p: {
     'conversions': p[4],
     'products': map(product, p[5])
 }
-products = map(food_type, food_type_data)
+food_types = map(food_type, food_type_data)
 
 units =["g", "kg", "can", "cans", "liter", "L", "ml", "spoon", "spoons", "teaspoon", "teaspoons", "tablespoon", "tablespoons", "slices", "slice", "cup", "cups", "lb"]
-ommitable =["sliced", "diced", "extra", "virgin", "sea", "fresh", "lean", "small", "medium", "large", "stalk"]
+ommitable =["", "sliced", "diced", "extra", "virgin", "sea", "fresh", "lean", "small", "medium", "large", "stalk"]
 
 
 def parse(ingredients_list):
@@ -189,53 +189,20 @@ def get_price(product_list):
 
 
 def get_product_details(line):
-    omitted_words = []
-    amount = 1.0
-    unit = 'unitless'
     line = remove_parentheses(line)
+    first_option = line.split(' or ')[0]
+    return get_single_product_details(first_option)
 
-    lines = line.split(' or ')
-    for single_line in lines:
-        words = single_line.split(" ")
-        for word in words:
-            if word_contains_digit(word):
-                single_line = single_line.replace(word, "", 1)
-                if word.find('-') != -1:
-                    word = word.split('-')[1]
-                if word.find('/') != -1:
-                    numbers = word.split('/')
-                    word = float(numbers[0])/int(numbers[1])
-                amount = float(word)
-                continue
-            if word_is_unit(word):
-                single_line = single_line.replace(word, "", 1)
-                unit = word
-                continue
-            if word_is_ommitable(word):
-                single_line = single_line.replace(word, "", 1)
-                omitted_words.append(word)
-                continue
-            single_line = fix_spaces(single_line)
+def get_single_product_details(line):
+    amount, unit, product_name = separate_product_details(line)
 
-        details = {}
-        details["products"] = []
-        for food_type in products:
-            for food in food_type["names"]:
-                if food in single_line:
-                    details["starts_disabled"] = food_type["starts_disabled"]
-                    for product in food_type["products"]:
-                        quantity = calc_quantity_per_product(product, unit, amount, food_type["conversions"])
-                        if food_type["sold_by_weight"]:
-                            details["products"].append({"name" : product["name"], "quantity" : quantity, "weight_unit": product["unit"],  'unit_weight': product["min_amount"]})
-                        else:
-                            details["products"].append({"name" : product["name"], "quantity" : quantity, "weight_unit": product["unit"]})
-
-        if len(details["products"]) > 0:
-            return details
-
-    assert details["products"], "error, didnt find product: " + line
-
-    return details
+    for food_type in food_types:
+        if product_name in food_type["names"]:
+            return {
+                "starts_disabled": food_type["starts_disabled"],
+                "products": get_food_type_products(food_type, amount, unit)
+            }
+    assert False, "didn't find food type: " + line
 
 def word_contains_digit(word):
     match = re.search("\d", word)
@@ -249,11 +216,22 @@ def word_is_unit(word):
 def word_is_ommitable(word):
     return word in ommitable
 
-def fix_spaces(line):
-    # multiple spaces to single spaces and strip
-    return re.sub(' +', ' ', line).strip()
-assert fix_spaces('asdf') == 'asdf'
-assert fix_spaces('  a  s d   f  ') == 'a s d f'
+def parse_amount(word):
+    if word.find('-') != -1:
+        low, high = word.split('-')
+        word = high
+
+    if word.find('/') != -1:
+        a, b = word.split('/')
+        return float(a) / int(b)
+    else:
+        return float(word)
+assert parse_amount('0') == 0.0
+assert parse_amount('12') == 12.0
+assert parse_amount('3/4') == 0.75
+assert parse_amount('2-6') == 6.0
+assert parse_amount('1/2-2') == 2.0
+assert parse_amount('1/2-3/4') == 0.75
 
 def remove_parentheses(line):
     if re.search(r'\([^)]*\(', line):
@@ -266,16 +244,30 @@ try:
 except ValueError:
     pass
 
-def calc_quantity_per_product(product, unit, amount, conversions):
-    if unit in conversions:
-        amount = conversions[unit] * amount
-    else:
-        amount = classic_conversion(unit, product["unit"], amount)
-    quantity = int(amount / product["min_amount"])
-    if amount % product["min_amount"]:
-        quantity += 1;
+def separate_product_details(line):
+    amount = 1.0
+    unit = 'unitless'
 
-    return quantity
+    words = line.split(" ")
+    product_words = []
+    for i in xrange(len(words)):
+        word = words[i]
+        if word_is_unit(word):
+            assert unit == 'unitless'
+            unit = word
+        elif word_is_ommitable(word):
+            pass
+        elif word_contains_digit(word):
+            amount = parse_amount(word)
+        else:
+            product_words.append(word)
+
+    product_name = ' '.join(product_words)
+    return amount, unit, product_name
+assert separate_product_details('onion') == (1, 'unitless', 'onion')
+assert separate_product_details('250 g bacon') == (250.0, 'g', 'bacon')
+assert separate_product_details('1/4 kg bacon') == (0.25, 'kg', 'bacon')
+assert separate_product_details('1 jar garlic') == (1, 'unitless', 'jar garlic')
 
 CONVERSIONS = {
     ('kg', 'g'): 1000.0,
@@ -288,46 +280,84 @@ CONVERSIONS = {
     ('ounce', 'L'): 0.0295735,
 }
 def classic_conversion(from_unit, to_unit, amount):
+    if from_unit == to_unit:
+        return amount
     key = (from_unit, to_unit)
     if key in CONVERSIONS:
         return amount * CONVERSIONS[key]
 
-    assert False, "UNITS ERROR FIX ME!!!!!!! recipe_unit = " + recipe_unit + " product_unit = " + product_unit
+    raise ValueError("UNITS ERROR FIX ME!!!!!!! recipe_unit = " + from_unit + " product_unit = " + to_unit)
 assert classic_conversion('kg', 'g', 10) == 10000
 assert classic_conversion('ml', 'L', 10) == 0.01
 
-#print get_product_details('1 cup tomato sauce')
-#print get_product_details('1 kg flour')
-#print get_product_details('1 cup diced onions')
-#print get_product_details('onion')
-#print get_product_details('1 cup olive oil')
+def calc_quantity_per_product(product, unit, amount, conversions):
+    if unit in conversions:
+        amount = conversions[unit] * amount
+    else:
+        amount = classic_conversion(unit, product["unit"], amount)
+    quantity = int(amount / product["min_amount"])
+    if amount % product["min_amount"]:
+        quantity += 1;
 
+    return quantity
+_onion = product(('onion', 50, 1, 'unitless'))
+_bacon = product(('bacon by weight', 100, 100, 'g'))
+assert calc_quantity_per_product(_onion, 'kg', 0.2, {'kg': 20.0}) == 4
+assert calc_quantity_per_product(_bacon, 'g', 250.0, {}) == 3
+assert calc_quantity_per_product(_bacon, 'kg', 0.25, {}) == 3
 
+def get_food_type_products(food_type, amount, unit):
+    products = []
+    for product in food_type["products"]:
+        
+        products.append({
+            "name" : product["name"],
+            "quantity": calc_quantity_per_product(product, unit, amount, food_type["conversions"]),
+            "price": product["price"],
+            "weight_unit": product["unit"] if food_type["sold_by_weight"] else None,
+            "unit_weight": product["min_amount"] if food_type["sold_by_weight"] else None
+        })
+    return products
 
-print get_product_details('1/4 lb bacon')
-print get_product_details('1 medium onion (finely chopped)')
-print get_product_details('1 stalk celery (finely chopped)')
-print get_product_details('1 large carrot (finely chopped)')
-print get_product_details('1 (2 teaspoon) jar garlic or 4 cloves garlic (minced)')
-print get_product_details('4 tablespoons butter or 4 tablespoons margarine')
-print get_product_details('3 tablespoons olive oil')
-print get_product_details('1 lb lean ground beef')
-print get_product_details('1/2-3/4 lb ground pork')
-print get_product_details('1 (8 ounce) can beef consomme')
-print get_product_details('1 cup dry white wine')
-print get_product_details('1 (28 ounce) cans&w italian style crushed tomatoes (or other)')
-print get_product_details('1 teaspoon salt')
-print get_product_details('1/2 teaspoon black pepper')
-print get_product_details('1 teaspoon rubbed sage')
-print get_product_details('1 tablespoon oregano')
-print get_product_details('1/2 teaspoon red pepper flakes')
-print get_product_details('1/4 teaspoon nutmeg')
-print get_product_details('1 cup milk (I use 2%)')
-print get_product_details('1 lb small penne pasta')
+_eggs_index = 0
+while 'eggs' not in food_types[_eggs_index]['names']:
+    _eggs_index += 1
+_egg_products = get_food_type_products(food_types[_eggs_index], 3, 'unitless')
+assert [p['name'] for p in _egg_products] == ['6 pack free range eggs', '12 pack free range eggs', '6 pack eggs', '12 pack eggs']
+assert _egg_products[0] == {'name': '6 pack free range eggs', 'price': 1500, 'quantity': 1, 'unit_weight': None, 'weight_unit': None}
+assert _egg_products[-1] == {'name': '12 pack eggs', 'price': 1600, 'quantity': 1, 'unit_weight': None, 'weight_unit': None}
+_egg_products = get_food_type_products(food_types[_eggs_index], 10, 'unitless')
+assert [p['name'] for p in _egg_products] == ['6 pack free range eggs', '12 pack free range eggs', '6 pack eggs', '12 pack eggs']
+assert _egg_products[0] == {'name': '6 pack free range eggs', 'price': 1500, 'quantity': 2, 'unit_weight': None, 'weight_unit': None}
+assert _egg_products[-1] == {'name': '12 pack eggs', 'price': 1600, 'quantity': 1, 'unit_weight': None, 'weight_unit': None}
 
+assert get_product_details('1 cup tomato sauce')['products'][0]['name'] == '100g osem tomato sauce'
 
+_recipe = '''
+Blah blah
 
+1/4 lb bacon
+1 medium onion (finely chopped)
+1 stalk celery (finely chopped)
+1 large carrot (finely chopped)
+1 (2 teaspoon) jar garlic or 4 cloves garlic (minced)
+4 tablespoons butter or 4 tablespoons margarine
+3 tablespoons olive oil
+1 lb lean ground beef
+1/2-3/4 lb ground pork
+1 (8 ounce) can beef consomme
+1 cup dry white wine
+1 (28 ounce) cans&w italian style crushed tomatoes (or other)
+1 teaspoon salt
+1/2 teaspoon black pepper
+1 teaspoon rubbed sage
+1 tablespoon oregano
+1/2 teaspoon red pepper flakes
+1/4 teaspoon nutmeg
+1 cup milk (I use 2%)
+1 lb small penne pasta
 
-#assert get_product_details('1 kg flour') == {'amount': '1', 'product': 'flour', 'unit': 'kg'}
-#assert get_product_details('1 cup tomato sauce') == (1, 'kg', 'flour')
-#assert get_product_details('1 cup diced onions') == {'amount': '1', 'product': 'onions', 'unit': 'cup'}
+blah blah
+'''
+# TODO
+#assert len(parse_recipe(_recipe)) == 20
