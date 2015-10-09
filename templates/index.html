@@ -5,27 +5,21 @@
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Recipe Upload</h4>
-      </div>
-      <div class="modal-body">
-        <div class="inner cover">
-
-              <div id="cam">
-
-              </div>
-              <div id="canv" style="display: none;"></div>
+      <form method='POST' action='{% url "ocr" %}' enctype="multipart/form-data">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Recipe Upload</h4>
+        </div>
+        <div class="modal-body">
+          <div class="inner cover">
+            <input type="file" accept="image/*" id="capture" name="webcam" capture="camera"> 
           </div>
-
-              <div id="take"><p><a type="button" class="btn btn-default btn-lg" href="javascript:take_snapshot(); $('#cam').hide(); $('#canv').show(); $('#take').hide(); $('#reload').show(); $('#continue').attr('disabled', false);"><span class="glyphicon glyphicon-camera"></span></a></p></div>
-               <div id="reload" style="display: none;"> <p><a type="button" class="btn btn-default btn-lg" href="javascript:$('#cam').show(); $('#canv').hide();  $('#take').show(); $('#reload').hide(); $('#continue').attr('disabled', true);"><span class="glyphicon glyphicon-refresh"></span></a></p></div>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button id="continue" disabled="disabled" type="button" class="btn btn-primary">Continue</button>
-      </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button id="continue" type="submit" class="btn btn-primary">Continue</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -38,31 +32,4 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static "js/webcam.min.js" %}"></script>
-<script>
-Webcam.set({
-  width: 540,
-  height: 405,
-  dest_width: 640,
-  dest_height: 480,
-  image_format: 'jpeg',
-  jpeg_quality: 90,
-  force_flash: false,
-  flip_horiz: false,
-  fps: 45
-});
-Webcam.attach( '#cam' );
-
-function take_snapshot() {
-  Webcam.snap( function(data_uri) {
-    $('#canv').html('<img src="'+data_uri+'" width=540 height=405 />');
-    $('#continue').click(function() {
-      Webcam.upload( data_uri, '{% url "ocr" %}', function(code, text) {
-        console.log(text);
-      });
-    });
-  });
-}
-
-</script>
 {% endblock %}
