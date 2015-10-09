@@ -224,11 +224,11 @@ def get_price(product_list):
     for product in product_list:
         for food_type in food_types:
             for db_product in food_type['products']:
-                if product["brand"] == db_product["name"]:
+                if product["product"] == db_product["name"]:
                     price += product["quantity"] * db_product["price"]
                     break
     return price
-assert get_price([{"brand" : '200g osem tomato sauce', "quantity" : 2}, {"brand" : '1L white wine', "quantity" : 3}]) == 6400
+assert get_price([{"product" : '200g osem tomato sauce', "quantity" : 2}, {"product" : '1L white wine', "quantity" : 3}]) == 6400
 
 
 
