@@ -173,6 +173,38 @@ food_type_data = [
             ('1L red wine', 2000, 1, 'L')
         ]
     ),
+    (['chicken stock'], False, False, 'g', {
+        'cups' : 0.1,
+        'cups' : 0.1
+        }, [
+            ('chicken stock power', 1500, 1, 'L')
+        ]
+    ),
+    (['chicken breast'], False, False, 'g', {
+        'unitless' : 500
+        }, [
+            ('chicken breast by weight', 2000, 100, 'g')
+        ]
+    ),
+    (['couscous'], False, False, 'g', {
+        'cups' : 100,
+        'cup' : 100
+        }, [
+            ('500 g couscous osem', 2000, 500, 'g')
+        ]
+    ),
+    (['baby spinach'], False, True, 'g', {
+        'bags' : 500
+        }, [
+            ('baby spinach', 200, 100, 'g')
+        ]
+    ),
+    (['lemon'], False, True, 'g', {
+        'tablespoons' : 0.1
+        }, [
+            ('lemon by weight', 200, 100, 'g')
+        ]
+    ),
 ]
 
 product = lambda b: {
@@ -191,8 +223,8 @@ food_type = lambda p: {
 }
 food_types = map(food_type, food_type_data)
 
-units =["g", "kg", "can", "cans", "liter", "L", "ml", "spoon", "spoons", "teaspoon", "teaspoons", "tablespoon", "tablespoons", "slices", "slice", "cup", "cups", "lb"]
-ommitable =["", "sliced", "diced", "extra", "virgin", "sea", "fresh", "lean", "small", "medium", "large", "stalk", "cans&w", "italian", "style", "rubbed", "flakes", "penne"]
+units =["g", "kg", "can", "cans", "liter", "L", "ml", "spoon", "spoons", "teaspoon", "teaspoons", "tablespoon", "tablespoons", "slices", "slice", "cup", "cups", "lb", "bags"]
+ommitable =["", "sliced", "diced", "extra", "virgin", "sea", "fresh", "lean", "small", "medium", "large", "stalk", "cans&w", "italian", "style", "rubbed", "flakes", "penne", "juice", "finely", "sliced", "into", "ribbons"]
 
 
 class NoSuchFoodType(Exception): pass
@@ -234,6 +266,8 @@ assert get_price([{"product" : '200g osem tomato sauce', "quantity" : 2}, {"prod
 
 def get_product_details(line):
     line = remove_parentheses(line)
+    line = line.replace(',', '')
+    line = line.replace('.', '')
     first_option = line.split(' or ')[0]
     return get_single_product_details(first_option)
 
@@ -404,3 +438,17 @@ Blah blah
 blah blah
 '''
 assert len(parse(_recipe)) == 20
+
+_recipe = '''
+Blah blah
+
+6 cups chicken stock or broth
+2 chicken breasts, finely sliced into ribbons
+1/2 cup couscous
+2 bags baby spinach, washed
+4-5 tablespoons lemon juice
+
+blah blah
+'''
+
+print parse(_recipe)
