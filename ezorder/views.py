@@ -1,7 +1,9 @@
 import os
 import json
+from django.http import HttpResponse
 from django.shortcuts import render, render_to_response
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
 from ezorder import tasks
 
 @require_GET
@@ -10,6 +12,11 @@ def get_index(request):
                               {
         'selected_nav': 'index',
     })
+
+@require_POST
+@csrf_exempt
+def ocr(request):
+    return HttpResponse('response')
 
 @require_GET
 def shopping_list(request):
