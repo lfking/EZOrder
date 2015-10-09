@@ -78,9 +78,13 @@ def order(request):
     return render(request, 'order.html', {'channel': channel})
 
 
-#@require_POST
+@require_POST
+@csrf_exempt
 def pay(request):
-    return render(request, 'pay.html')
+    data = json.loads(request.POST['data'])
+    cents = parse_ingredients.get_price(data)
+    1/0
+    return render(request, 'pay.html', {'price': "%s.%s" % (cents / 100, cents % 100) })
 
 @require_POST
 def create_purchase(request):
