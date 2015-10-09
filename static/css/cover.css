@@ -160,3 +160,51 @@ body {
   background: none;
   width: 100%;
 }
+
+li.list-group-item{
+}
+
+.after-header { padding:50px 0px; }
+
+.table {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 20px;
+}
+
+
+.navbar-static-top {
+        position: relative;
+        top: auto;
+        display: block;
+        width: 100%;
+    }
+    .navbar-collapse {
+        max-height: none;
+}
+
+body {
+    font-size: 45px;
+}
+
+h1 {
+    font-size: 80px;
+}
+
+p {
+    font-size: 45px;
+}
+.btn {
+    font-size: 35px;
+}
+
+.btn-success {
+    font-size: 90px;
+}
+input[type="radio"], input[type="checkbox"] {
+    -ms-transform: scale(4); /* IE */
+  -moz-transform: scale(4); /* FF */
+  -webkit-transform: scale(4); /* Safari and Chrome */
+  -o-transform: scale(4); /* Opera */
+  padding: 10px;
+}
