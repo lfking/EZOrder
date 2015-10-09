@@ -16,6 +16,7 @@ import xml.dom.minidom
 
 class ProcessingSettings:
     Language = "English"
+    Profile = "documentConversion"
     OutputFormat = "docx"
 
 
@@ -41,13 +42,17 @@ class AbbyyOnlineSdk:
     enableDebugging = 0
 
     def ProcessImage( self, filePath, settings ):
+        return self.ProcessImageFile(open( filePath, "rb" ), settings)
+
+    def ProcessImageFile( self, fileHandle, settings ):
         urlParams = urllib.urlencode({
             "language" : settings.Language,
+            "profile": settings.Profile,
             "exportFormat" : settings.OutputFormat
             })
         requestUrl = self.ServerUrl + "processImage?" + urlParams
 
-        bodyParams = { "file" : open( filePath, "rb" )  }
+        bodyParams = { "file" : fileHandle  }
         request = urllib2.Request( requestUrl, None, self.buildAuthInfo() )
         response = self.getOpener().open(request, bodyParams).read()
         if response.find( '<Error>' ) != -1 :
@@ -67,12 +72,15 @@ class AbbyyOnlineSdk:
         return task
 
     def DownloadResult( self, task, outputPath ):
+        fileResponse = self.GetResultFile(task)
+        resultFile = open( outputPath, "wb" )
+        resultFile.write( fileResponse )
+
+    def GetResultFile( self, task ):
         getResultParams = urllib.urlencode( { "taskId" : task.Id } )
         getResultUrl = self.ServerUrl + "getResult?" + getResultParams
         request = urllib2.Request( getResultUrl, None, self.buildAuthInfo() )
-        fileResponse = self.getOpener().open( request ).read()
-        resultFile = open( outputPath, "wb" )
-        resultFile.write( fileResponse )
+        return self.getOpener().open( request )
 
 
     def DecodeResponse( self, xmlResponse ):
