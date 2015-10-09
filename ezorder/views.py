@@ -53,6 +53,7 @@ def shopping_list(request):
     'selected': True,
     'brands': [
          {'name': 'tomatoes by weight', 'quantity': 2, 'unit_weight': 0.5, 'weight_unit': 'kg', 'price': 500},
+         {'name': 'Organic Tomatos', 'quantity': 5, 'unit_weight': 0.2, 'weight_unit': 'kg', 'price': 200}
     ],
   },
   {
