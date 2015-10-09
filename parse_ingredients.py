@@ -198,7 +198,7 @@ def get_product_details(line):
     for single_line in lines:
         words = single_line.split(" ")
         for word in words:
-            if word_is_number(word):
+            if word_contains_digit(word):
                 single_line = single_line.replace(word, "", 1)
                 if word.find('-') != -1:
                     word = word.split('-')[1]
@@ -233,42 +233,38 @@ def get_product_details(line):
         if len(details["products"]) > 0:
             return details
 
-    if len(details["products"]) == 0:
-        print "error, didnt find product: " + line
+    assert details["products"], "error, didnt find product: " + line
 
     return details
 
-def word_is_number(word):
+def word_contains_digit(word):
     match = re.search("\d", word)
-    if match:
-        return True
-    return False
-
+    return bool(match)
+assert word_contains_digit('asdf5fasdf')
+assert not word_contains_digit('asdffasdf')
 
 def word_is_unit(word):
-    if word in units:
-        return True
-    return False
-
+    return word in units
 
 def word_is_ommitable(word):
-    if word in ommitable:
-        return True
-    return False
-
+    return word in ommitable
 
 def fix_spaces(line):
-    line = re.sub(' +', ' ', line)
-    line = line.lstrip()
-    return line.rstrip()
+    # multiple spaces to single spaces and strip
+    return re.sub(' +', ' ', line).strip()
+assert fix_spaces('asdf') == 'asdf'
+assert fix_spaces('  a  s d   f  ') == 'a s d f'
 
 def remove_parentheses(line):
-    start = line.find('(')
-    end = line.find(')')
-    if start == -1 and end == -1:
-        return line
-    word = line[start:end+1]
-    return line.replace(word, "")
+    if re.search(r'\([^)]*\(', line):
+        raise ValueError()
+    return re.sub(r'\([^)]*\)', '', line)
+assert remove_parentheses('a(b)c(d)e') == 'ace'
+try:
+    remove_parentheses('(())')
+    assert False
+except ValueError:
+    pass
 
 def calc_quantity_per_product(product, unit, amount, conversions):
     if unit in conversions:
@@ -281,26 +277,24 @@ def calc_quantity_per_product(product, unit, amount, conversions):
 
     return quantity
 
-def classic_conversion(recipe_unit, product_unit, amount):
-    if recipe_unit == product_unit or recipe_unit == '':
-        return amount
-    if recipe_unit == 'kg' and product_unit == 'g':
-        return amount * 1000
-    if recipe_unit == 'g' and product_unit == 'kg':
-        return float(amount) / 1000
-    if recipe_unit == 'ml' and product_unit == 'L':
-        return amount * 1000
-    if recipe_unit == 'L' and product_unit == 'ml':
-        return float(amount) / 1000
-    if recipe_unit == 'lb' and product_unit == 'kg':
-        return amount * 0.453592
-    if recipe_unit == 'lb' and product_unit == 'g':
-        return amount * 453.592
-    if recipe_unit == 'ounce' and product_unit == 'ml':
-        return amount * 29.5735
-    if recipe_unit == 'ounce' and product_unit == 'L':
-        return amount * 0.0295735
-    print "UNITS ERROR FIX ME!!!!!!! recipe_unit = " + recipe_unit + " product_unit = " + product_unit
+CONVERSIONS = {
+    ('kg', 'g'): 1000.0,
+    ('g', 'kg'): 0.001,
+    ('lb', 'kg'): 0.453592,
+    ('lb', 'g'): 453.592,
+    ('ml', 'L'): 0.001,
+    ('L', 'ml'): 1000.0,
+    ('ounce', 'ml'): 29.5735,
+    ('ounce', 'L'): 0.0295735,
+}
+def classic_conversion(from_unit, to_unit, amount):
+    key = (from_unit, to_unit)
+    if key in CONVERSIONS:
+        return amount * CONVERSIONS[key]
+
+    assert False, "UNITS ERROR FIX ME!!!!!!! recipe_unit = " + recipe_unit + " product_unit = " + product_unit
+assert classic_conversion('kg', 'g', 10) == 10000
+assert classic_conversion('ml', 'L', 10) == 0.01
 
 #print get_product_details('1 cup tomato sauce')
 #print get_product_details('1 kg flour')
