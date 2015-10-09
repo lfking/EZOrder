@@ -4,14 +4,14 @@ __author__ = 'eitanz'
 food_type_data = [
     (['tomato', 'tomatoes', 'fresh tomatoes'], False, True, 'g', {
             'cup': 200,
-            'single' : 150
+            'unitless' : 150
         }, [
             ('tomatoes by weight', 99, 500, 'g')
         ]
     ),
     (['crushed tomato', 'tomato sauce', 'tomatoes sauce', 'fresh tomatoes sauce'], False, False, 'g', {
         'cup': 300,
-        'single':200
+        'unitless':200
         }, [
             ('100g osem tomato sauce', 120, 100, 'g'),
             ('200g osem tomato sauce    ', 200, 200, 'g')
@@ -32,7 +32,7 @@ food_type_data = [
     ),
     (['onion', 'onions'], False, True, 'g', {
             'cup': 200,
-            'single' : 150
+            'unitless' : 150
         }, [
             ('onions by weight', 99, 500, 'g')
         ]
@@ -84,13 +84,13 @@ food_type_data = [
         ]
     ),
     (['celery'], False, True, 'g', {
-        'single' : 300
+        'unitless' : 300
         }, [
             ('celery by weight', 299, 500, 'g'),
         ]
     ),
     (['carrot', 'carrots'], False, True, 'g', {
-        'single': 100
+        'unitless': 100
         }, [
             ('carrots by weight', 299, 500, 'g'),
         ]
@@ -98,14 +98,14 @@ food_type_data = [
     (['garlic'], False, True, 'g', {
         'clover' : 10,
         'clove' : 10,
-        'single' : 1,
+        'unitless' : 1,
         "ml" : 0.25
         }, [
-            ('single garlig head', 100, 100, 'g')
+            ('single garlic head', 100, 100, 'g')
         ]
     ),
     (['butter'], True, False, 'g', {
-        'single' : 500,
+        'unitless' : 500,
         'tablespoon': 0.1,
         'tablespoons': 0.1
         }, [
@@ -114,7 +114,7 @@ food_type_data = [
         ]
     ),
     (['olive oil'], True, False, 'L', {
-        'single' : 1000,
+        'unitless' : 1000,
         'tablespoon': 0.1,
         'tablespoons': 0.1,
         'cup' : 100
@@ -191,7 +191,7 @@ def get_price(product_list):
 def get_product_details(line):
     omitted_words = []
     amount = 1.0
-    unit = 'single'
+    unit = 'unitless'
     line = remove_parentheses(line)
 
     lines = line.split(' or ')
