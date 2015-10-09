@@ -2,18 +2,19 @@ import re
 
 __author__ = 'eitanz'
 food_type_data = [
-    (['tomato', 'tomatoes', 'fresh tomatoes'], False, True, 'gr', {
+    (['tomato', 'tomatoes', 'fresh tomatoes'], False, True, 'g', {
             'cup': 200,
             'single' : 150
         }, [
-            ('tomatoes by weight', 99, 500, 'gr')
+            ('tomatoes by weight', 99, 500, 'g')
         ]
     ),
-    (['tomato sauce', 'tomatoes sauce', 'fresh tomatoes sauce'], False, False, 'gr', {
-        'cup': 300
+    (['crushed tomato', 'tomato sauce', 'tomatoes sauce', 'fresh tomatoes sauce'], False, False, 'g', {
+        'cup': 300,
+        'single':200
         }, [
-            ('100g osem tomato paste', 120, 100, 'gr'),
-            ('200g osem tomato paste', 200, 200, 'gr')
+            ('100g osem tomato sauce', 120, 100, 'g'),
+            ('200g osem tomato sauce    ', 200, 200, 'g')
         ]
     ),
     (['egg', 'eggs'], False, False, 'carton', {}, [
@@ -29,11 +30,127 @@ food_type_data = [
             ('regular flour', 1000, 1000, 'g')
         ]
     ),
-    (['onion', 'onions'], False, True, 'gr', {
+    (['onion', 'onions'], False, True, 'g', {
             'cup': 200,
             'single' : 150
         }, [
-            ('onions by weight', 99, 500, 'gr')
+            ('onions by weight', 99, 500, 'g')
+        ]
+    ),
+    (['milk'], False, False, 'L', {
+            'cup': 1,
+        }, [
+            ('1L Tnuva', 1000, 1, 'L'),
+            ('2L Tnuva', 1700, 2, 'L'),
+            ('1L Tara', 1100, 1, 'L')
+        ]
+    ),
+    (['salt'], True, False, 'g', {
+            'teaspoon': 0.1,
+            'tablespoon': 0.2
+        }, [
+            ('1 kg Sugat', 1000, 1000, 'g'),
+            ('3kg Sugat', 2500, 3000, 'g')
+        ]
+    ),
+    (['black pepper'], True, False, 'g', {
+            'teaspoon': 0.1,
+            'tablespoon': 0.2
+        }, [
+            ('100g ground black pepper', 500, 100, 'g')
+        ]
+    ),
+    (['oregano'], True, False, 'g', {
+            'teaspoon': 0.1,
+            'tablespoon': 0.2
+        }, [
+            ('100g oregano', 500, 100, 'g')
+        ]
+    ),
+    (['red pepper'], True, False, 'g', {
+            'teaspoon': 0.1,
+            'tablespoon': 0.2,
+        }, [
+            ('100g ground red pepper', 500, 100, 'g')
+        ]
+    ),
+    (['pasta'], False, False, 'g', {}, [
+            ('500g spaghetti', 1500, 500, 'g'),
+            ('500g penne', 2000, 500, 'g')
+        ]
+    ),
+    (['bacon'], False, True, 'g', {}, [
+            ('bacon by weight', 100, 100, 'g'),
+        ]
+    ),
+    (['celery'], False, True, 'g', {
+        'single' : 300
+        }, [
+            ('celery by weight', 299, 500, 'g'),
+        ]
+    ),
+    (['carrot', 'carrots'], False, True, 'g', {
+        'single': 100
+        }, [
+            ('carrots by weight', 299, 500, 'g'),
+        ]
+    ),
+    (['garlic'], False, True, 'g', {
+        'clover' : 10,
+        'clove' : 10,
+        'single' : 1,
+        "ml" : 0.25
+        }, [
+            ('single garlig head', 100, 100, 'g')
+        ]
+    ),
+    (['butter'], True, False, 'g', {
+        'single' : 500,
+        'tablespoon': 0.1,
+        'tablespoons': 0.1
+        }, [
+            ('500g butter Tnuva', 1000, 500, 'g'),
+            ('500g butter TARA', 1000, 500, 'g')
+        ]
+    ),
+    (['olive oil'], True, False, 'L', {
+        'single' : 1000,
+        'tablespoon': 0.1,
+        'tablespoons': 0.1,
+        'cup' : 100
+        }, [
+            ('1L olivia extra virgin olive oil', 1000, 1000, 'L'),
+            ('1L el oilio extra virgin olive oil', 1200, 1000, 'L')
+        ]
+    ),
+    (['ground beef'], False, True, 'g', {
+        }, [
+            ('ground beef', 500, 100, 'g')
+        ]
+    ),
+    (['ground pork'], False, True, 'g', {
+        }, [
+            ('ground pork', 550, 100, 'g')
+        ]
+    ),
+    (['beef consomme'], False, True, 'g', {
+        'can': 800
+        }, [
+            ('beef consomme can', 1200, 800, 'g')
+        ]
+    ),
+    (['white wine', 'dry white wine'], False, False, 'L', {
+        'cup' : 0.2,
+        'cups' : 0.2
+        }, [
+            ('1L white wine', 2000, 1, 'L')
+        ]
+    ),
+    (['red wine', 'dry red wine'], False, False, 'L', {
+        'cup' : 0.2,
+        'cups' : 0.2
+        }, [
+            ('1L red wine', 2000, 1, 'L')
         ]
     ),
 ]
@@ -54,8 +171,8 @@ food_type = lambda p: {
 }
 products = map(food_type, food_type_data)
 
-units =["g", "kg", "can", "cans", "liter", "L", "spoon", "spoons", "tablespoon", "tablespoons", "slices", "slice", "small", "large", "cup", "cups"]
-ommitable =["sliced", "diced", "extra", "virgin", "ground", "sea", "fresh"]
+units =["g", "kg", "can", "cans", "liter", "L", "ml", "spoon", "spoons", "teaspoon", "teaspoons", "tablespoon", "tablespoons", "slices", "slice", "cup", "cups", "lb"]
+ommitable =["sliced", "diced", "extra", "virgin", "sea", "fresh", "lean", "small", "medium", "large", "stalk"]
 
 
 def parse(ingredients_list):
@@ -72,40 +189,54 @@ def get_price(product_list):
 
 
 def get_product_details(line):
-    details = {}
-    details["products"] = []
-    words = line.split(" ")
     omitted_words = []
     amount = 1.0
     unit = 'single'
-    for word in words:
-        if word_is_number(word):
-            amount = float(word)
-            line = line.replace(word, "", 1)
-            continue
-        if word_is_unit(word):
-            unit = word
-            line = line.replace(word, "", 1)
-            continue
-        if word_is_ommitable(word):
-            omitted_words.append(word)
-            line = line.replace(word, "", 1)
-            continue
-    line = fix_spaces(line)
-    for food_type in products:
-        if line in food_type["names"]:
-            details["starts_disabled"] = food_type["starts_disabled"]
-            for product in food_type["products"]:
-                quantity = calc_quantity_per_product(product, unit, amount, food_type["conversions"])
-                if food_type["sold_by_weight"]:
-                    details["products"].append({"name" : product["name"], "quantity" : quantity, "weight_unit": product["unit"],  'unit_weight': product["min_amount"]})
-                else:
-                    details["products"].append({"name" : product["name"], "quantity" : quantity, "weight_unit": product["unit"]})
+    line = remove_parentheses(line)
+
+    lines = line.split(' or ')
+    for single_line in lines:
+        words = single_line.split(" ")
+        for word in words:
+            if word_is_number(word):
+                single_line = single_line.replace(word, "", 1)
+                if word.find('-') != -1:
+                    word = word.split('-')[1]
+                if word.find('/') != -1:
+                    numbers = word.split('/')
+                    word = float(numbers[0])/int(numbers[1])
+                amount = float(word)
+                continue
+            if word_is_unit(word):
+                single_line = single_line.replace(word, "", 1)
+                unit = word
+                continue
+            if word_is_ommitable(word):
+                single_line = single_line.replace(word, "", 1)
+                omitted_words.append(word)
+                continue
+            single_line = fix_spaces(single_line)
+
+        details = {}
+        details["products"] = []
+        for food_type in products:
+            for food in food_type["names"]:
+                if food in single_line:
+                    details["starts_disabled"] = food_type["starts_disabled"]
+                    for product in food_type["products"]:
+                        quantity = calc_quantity_per_product(product, unit, amount, food_type["conversions"])
+                        if food_type["sold_by_weight"]:
+                            details["products"].append({"name" : product["name"], "quantity" : quantity, "weight_unit": product["unit"],  'unit_weight': product["min_amount"]})
+                        else:
+                            details["products"].append({"name" : product["name"], "quantity" : quantity, "weight_unit": product["unit"]})
+
+        if len(details["products"]) > 0:
+            return details
 
     if len(details["products"]) == 0:
         print "error, didnt find product: " + line
-    return details
 
+    return details
 
 def word_is_number(word):
     match = re.search("\d", word)
@@ -128,10 +259,18 @@ def word_is_ommitable(word):
 
 def fix_spaces(line):
     line = re.sub(' +', ' ', line)
-    return line.lstrip()
+    line = line.lstrip()
+    return line.rstrip()
+
+def remove_parentheses(line):
+    start = line.find('(')
+    end = line.find(')')
+    if start == -1 and end == -1:
+        return line
+    word = line[start:end+1]
+    return line.replace(word, "")
 
 def calc_quantity_per_product(product, unit, amount, conversions):
-    print amount
     if unit in conversions:
         amount = conversions[unit] * amount
     else:
@@ -149,13 +288,51 @@ def classic_conversion(recipe_unit, product_unit, amount):
         return amount * 1000
     if recipe_unit == 'g' and product_unit == 'kg':
         return float(amount) / 1000
+    if recipe_unit == 'ml' and product_unit == 'L':
+        return amount * 1000
+    if recipe_unit == 'L' and product_unit == 'ml':
+        return float(amount) / 1000
+    if recipe_unit == 'lb' and product_unit == 'kg':
+        return amount * 0.453592
+    if recipe_unit == 'lb' and product_unit == 'g':
+        return amount * 453.592
+    if recipe_unit == 'ounce' and product_unit == 'ml':
+        return amount * 29.5735
+    if recipe_unit == 'ounce' and product_unit == 'L':
+        return amount * 0.0295735
     print "UNITS ERROR FIX ME!!!!!!! recipe_unit = " + recipe_unit + " product_unit = " + product_unit
 
-print get_product_details('1 cup tomato sauce')
-print get_product_details('1 kg flour')
-print get_product_details('1 cup diced onions')
-print get_product_details('onion')
-print get_product_details('5 tomatoes')
+#print get_product_details('1 cup tomato sauce')
+#print get_product_details('1 kg flour')
+#print get_product_details('1 cup diced onions')
+#print get_product_details('onion')
+#print get_product_details('1 cup olive oil')
+
+
+
+print get_product_details('1/4 lb bacon')
+print get_product_details('1 medium onion (finely chopped)')
+print get_product_details('1 stalk celery (finely chopped)')
+print get_product_details('1 large carrot (finely chopped)')
+print get_product_details('1 (2 teaspoon) jar garlic or 4 cloves garlic (minced)')
+print get_product_details('4 tablespoons butter or 4 tablespoons margarine')
+print get_product_details('3 tablespoons olive oil')
+print get_product_details('1 lb lean ground beef')
+print get_product_details('1/2-3/4 lb ground pork')
+print get_product_details('1 (8 ounce) can beef consomme')
+print get_product_details('1 cup dry white wine')
+print get_product_details('1 (28 ounce) cans&w italian style crushed tomatoes (or other)')
+print get_product_details('1 teaspoon salt')
+print get_product_details('1/2 teaspoon black pepper')
+print get_product_details('1 teaspoon rubbed sage')
+print get_product_details('1 tablespoon oregano')
+print get_product_details('1/2 teaspoon red pepper flakes')
+print get_product_details('1/4 teaspoon nutmeg')
+print get_product_details('1 cup milk (I use 2%)')
+print get_product_details('1 lb small penne pasta')
+
+
+
 
 #assert get_product_details('1 kg flour') == {'amount': '1', 'product': 'flour', 'unit': 'kg'}
 #assert get_product_details('1 cup tomato sauce') == (1, 'kg', 'flour')
