@@ -235,10 +235,9 @@ def parse(ingredients_list):
     output_list = []
     lines = ingredients_list.split("\n")
     for line in lines:
-        pass
         if line != '':
             try:
-                output_list.append(get_product_details(line))
+                output_list.append(get_product_details(line.strip()))
                 if not ingredients_started:
                     ingredients_started = True
                 if ingredients_ended:
@@ -451,3 +450,10 @@ blah blah
 '''
 
 assert len(parse(_recipe)) == 5
+
+_recipe = '\xef\xbb\xbffgt is brilliant in soup as it cooks quickly and adds a lovely hearty \r\ntexture I make your soup more of a meal-in-a-bowl. \r\nIf you have access to kale or other greens they may be substituted for \r\nthe baby spinach for a more rustic soup. \r\n6 cups chicken stock or broth \r\n2 chicken breasts, finely sliced into ribbons \r\n|p/2 ci||$puscous \r\n2 bags baby spinach, washed \r\n4-5 iablespoons lemon juice \r\nBring the stock to the boil in a large saucej^^H \r\n \r\nAdd chicken and cooi< or 2 - 3 minutes or \r\nScoop our the chicken and divide between \r\nMeanwhile return the broth to the boil. Add couscous and return to J \r\nH boil then stir through the spinach leaves until they are just wiitefl \r\n'
+#print parse(_recipe)
+
+_recipe = '''\xef\xbb\xbf                                           Couscous is brilliant in soup as it cooks quickly and adds a lovely hearty     \r\n                                           texture to make your soup more of a meal-in-a-bowl. \r\n                           If you have access to kale or other greens they may be substituted for                                               \r\n                           the baby spinach for a more rustic soup.                                                                     \r\n
+                                                         6 cups chicken stock or broth                                                      \r\n                                                      2 chicken breasts, finely sliced into ribbons                                      \r\n                                                 1/2 cup couscous                                                         \r\n                                              2 bags baby spinach, washed                                                     \r\n                                          4-5 tablespoons lemon juice                                                 \r\n                                             \r\n                   Bring the stock to the boil in a large saucepan.                                         \r\n Add chicken and cool* or 2-3 minutes or until ist cooked through.                                     \r\n Scoop our the chicken and divide between 4 bowls. Keep warm.                                 \r\n                             \r\nMeanwhile return the broth to the boil. Add couscous and return to                         \r\nthe boil then stir through the spinach leaves until they are just wilted.                     \r\n'''
+#print parse(_recipe)

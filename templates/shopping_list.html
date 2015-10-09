@@ -33,16 +33,16 @@
 function addRow(rowData) {
     var row = $('<tr>');
     row.append($('<td>').addClass('selected').append(
-            $('<input>').attr('type', 'checkbox').prop('checked', rowData.selected)
+            $('<input>').attr('type', 'checkbox').prop('checked', !rowData.starts_disabled)
                     .change(function(e) {
                         var tr = $(e.target).parents('tr');
                         var o = {
-                            selected: $('input[type=checkbox]', tr).is(':checked'),
-                            brands: []
+                            starts_disabled: !$('input[type=checkbox]', tr).is(':checked'),
+                            products: []
                         };
                         $('option', tr).each(function(i, el) {
                             var el = $(el);
-                            o.brands.push({
+                            o.products.push({
                                 name: el.val(),
                                 quantity: el.data('quantity'),
                                 price: el.data('price')
@@ -52,18 +52,18 @@ function addRow(rowData) {
                         addRow(o);
                     })));
     row.append($('<td>').addClass('quantity').append(
-            $('<input>').attr('type', 'number').val(rowData.brands[0].quantity)));
+            $('<input>').attr('type', 'number').val(rowData.products[0].quantity)));
 
-    var brands = $('<select>');
-    for(var j = 0; j < rowData.brands.length; j++) {
-        var quantity = rowData.brands[j].quantity;
-        var name = rowData.brands[j].name;
-        var price = rowData.brands[j].price;
+    var products = $('<select>');
+    for(var j = 0; j < rowData.products.length; j++) {
+        var quantity = rowData.products[j].quantity;
+        var name = rowData.products[j].name;
+        var price = rowData.products[j].price;
         var option = $('<option>')
                 .val(name).data('quantity', quantity).text(name).data('price', price);
-        brands.append(option);
+        products.append(option);
     }
-    brands.on('focus', function(e) {
+    products.on('focus', function(e) {
         $('option', e.target).each(function(i, el) {
             el = $(el);
             el.text(el.data('quantity') + 'x ' + el.val() + ' - ' + el.data('price') + ' cents');
@@ -79,12 +79,12 @@ function addRow(rowData) {
         el.blur();
     });
 
-    row.append($('<td>').append(brands));
-    if (rowData.selected) {
-        enabledList.append(row);
-    } else {
+    row.append($('<td>').append(products));
+    if (rowData.starts_disabled) {
         disabledList.append(row);
         row.addClass("danger")
+    } else {
+        enabledList.append(row);
     }
 }
 

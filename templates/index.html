@@ -5,7 +5,7 @@
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form method='POST' action='{% url "ocr" %}' enctype="multipart/form-data">
+      <form method='POST' action='{% url "ocr" %}' enctype="multipart/form-data" id="webcam-form" >
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           <h4 class="modal-title" id="myModalLabel">Recipe Upload</h4>
@@ -32,4 +32,26 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+$(function() {
+  $('#continue').click(function(e) {
+    e.preventDefault();
+    var formData = new FormData($('#webcam-form')[0]);
+    $.ajax({
+      url: '{% url "ocr" %}',  //Server script to process data
+      type: 'POST',
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false
+    }).done(function(result) {
+      console.log(result.data);
+      var form = $('<form method="POST" action="{% url "shopping-list" %}">');
+      form.append($('<input type="hidden" name="data">').val(JSON.stringify(result.data)));
+      $('body').append(form);
+      form.submit();
+    });
+  });
+});
+</script>
 {% endblock %}

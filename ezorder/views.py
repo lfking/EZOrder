@@ -1,7 +1,7 @@
 import os
 import json
 import tempfile
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
@@ -37,33 +37,14 @@ def ocr(request):
     finally:
         os.remove(path)
     items = parse_ingredients.parse(recipe_text)
-    return JsonResponse(items)
+    return JsonResponse({'data': items})
 
-@require_GET
+#@require_POST
+@csrf_exempt
 def shopping_list(request):
-    items = [
-  {
-    'selected': True,
-    'brands': [
-         {'name': '1L Olivia olive oil', 'quantity': 2, 'weight_unit': None, 'price': 1000},
-         {'name': '2L Tnuva olive oil', 'quantity': 1, 'weight_unit': None,'price': 1200},
-    ],
-  },
-  {
-    'selected': True,
-    'brands': [
-         {'name': 'tomatoes by weight', 'quantity': 2, 'unit_weight': 0.5, 'weight_unit': 'kg', 'price': 500},
-    ],
-  },
-  {
-    'selected': False,
-    'brands': [
-         {'name': '500g Kosher Salt', 'quantity': 1, 'weight_unit': None, 'price': 6200},
-         {'name': '2L Tnuva olive oil', 'quantity': 1, 'weight_unit': None, 'price': 5800}
-    ],
-  }
-]
-    data = json.dumps(items)
+    print request.POST
+    data = request.POST['data']
+    #data = ('[{"products":[{"price":1500,"unit_weight":null,"name":"chicken stock power","weight_unit":null,"quantity":1}],"starts_disabled":false}]')
     return render_to_response('shopping_list.html',
                               {
         'selected_nav': 'shop',
