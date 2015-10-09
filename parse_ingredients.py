@@ -9,7 +9,7 @@ food_type_data = [
             ('tomatoes by weight', 99, 500, 'g')
         ]
     ),
-    (['crushed tomato', 'tomato sauce', 'tomatoes sauce', 'fresh tomatoes sauce'], False, False, 'g', {
+    (['crushed tomatoes', 'tomato sauce', 'tomatoes sauce', 'fresh tomatoes sauce'], False, False, 'g', {
         'cup': 300,
         'unitless':200
         }, [
@@ -67,6 +67,20 @@ food_type_data = [
             ('100g oregano', 500, 100, 'g')
         ]
     ),
+    (['sage'], True, False, 'g', {
+            'teaspoon': 0.1,
+            'tablespoon': 0.2
+        }, [
+            ('100g sage', 500, 100, 'g')
+        ]
+    ),
+    (['nutmeg'], True, False, 'g', {
+            'teaspoon': 0.1,
+            'tablespoon': 0.2
+        }, [
+            ('100g nutmeg', 500, 100, 'g')
+        ]
+    ),
     (['red pepper'], True, False, 'g', {
             'teaspoon': 0.1,
             'tablespoon': 0.2,
@@ -99,9 +113,15 @@ food_type_data = [
         'clover' : 10,
         'clove' : 10,
         'unitless' : 1,
-        "ml" : 0.25
         }, [
             ('single garlic head', 100, 100, 'g')
+        ]
+    ),
+        (['jar garlic', 'garlic jar'], False, False, 'g', {
+        'unitless' : 1,
+        "ml" : 0.25
+        }, [
+            ('single garlic jar', 100, 550, 'g')
         ]
     ),
     (['butter'], True, False, 'g', {
@@ -172,15 +192,30 @@ food_type = lambda p: {
 food_types = map(food_type, food_type_data)
 
 units =["g", "kg", "can", "cans", "liter", "L", "ml", "spoon", "spoons", "teaspoon", "teaspoons", "tablespoon", "tablespoons", "slices", "slice", "cup", "cups", "lb"]
-ommitable =["", "sliced", "diced", "extra", "virgin", "sea", "fresh", "lean", "small", "medium", "large", "stalk"]
+ommitable =["", "sliced", "diced", "extra", "virgin", "sea", "fresh", "lean", "small", "medium", "large", "stalk", "cans&w", "italian", "style", "rubbed", "flakes", "penne"]
 
+
+class NoSuchFoodType(Exception): pass
 
 def parse(ingredients_list):
+    ingredients_started = False
+    ingredients_ended = False
     output_list = []
     lines = ingredients_list.split("\n")
     for line in lines:
         pass
-        output_list.append(get_product_details(line))
+        if line != '':
+            try:
+                output_list.append(get_product_details(line))
+                if not ingredients_started:
+                    ingredients_started = True
+                if ingredients_ended:
+                    raise NoSuchFoodType("LAST LINE")
+            except NoSuchFoodType:
+                if ingredients_started:
+                    ingredients_ended = True
+                    #raise
+
     return output_list
 
 
@@ -202,7 +237,7 @@ def get_single_product_details(line):
                 "starts_disabled": food_type["starts_disabled"],
                 "products": get_food_type_products(food_type, amount, unit)
             }
-    assert False, "didn't find food type: " + line
+    raise NoSuchFoodType("didn't find food type: " + line)
 
 def word_contains_digit(word):
     match = re.search("\d", word)
@@ -359,5 +394,6 @@ Blah blah
 
 blah blah
 '''
+print parse(_recipe)
 # TODO
 #assert len(parse_recipe(_recipe)) == 20
