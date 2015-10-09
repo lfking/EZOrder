@@ -180,7 +180,7 @@ food_type_data = [
             ('chicken stock power', 1500, 1, 'L')
         ]
     ),
-    (['chicken breast'], False, False, 'g', {
+    (['chicken breasts'], False, False, 'g', {
         'unitless' : 500
         }, [
             ('chicken breast by weight', 2000, 100, 'g')
@@ -224,7 +224,7 @@ food_type = lambda p: {
 food_types = map(food_type, food_type_data)
 
 units =["g", "kg", "can", "cans", "liter", "L", "ml", "spoon", "spoons", "teaspoon", "teaspoons", "tablespoon", "tablespoons", "slices", "slice", "cup", "cups", "lb", "bags"]
-ommitable =["", "sliced", "diced", "extra", "virgin", "sea", "fresh", "lean", "small", "medium", "large", "stalk", "cans&w", "italian", "style", "rubbed", "flakes", "penne", "juice", "finely", "sliced", "into", "ribbons"]
+ommitable =["", "sliced", "diced", "extra", "virgin", "sea", "fresh", "lean", "small", "medium", "large", "stalk", "cans&w", "italian", "style", "rubbed", "flakes", "penne", "juice", "finely", "sliced", "into", "ribbons", "washed"]
 
 
 class NoSuchFoodType(Exception): pass
@@ -268,6 +268,7 @@ def get_product_details(line):
     line = remove_parentheses(line)
     line = line.replace(',', '')
     line = line.replace('.', '')
+    line = line.replace('/r', '')
     first_option = line.split(' or ')[0]
     return get_single_product_details(first_option)
 
@@ -412,7 +413,6 @@ assert _egg_products[-1] == {'name': '12 pack eggs', 'price': 1600, 'quantity': 
 assert get_product_details('1 cup tomato sauce')['products'][0]['name'] == '100g osem tomato sauce'
 
 _recipe = '''
-Blah blah
 
 1/4 lb bacon
 1 medium onion (finely chopped)
@@ -435,20 +435,19 @@ Blah blah
 1 cup milk (I use 2%)
 1 lb small penne pasta
 
-blah blah
 '''
 assert len(parse(_recipe)) == 20
 
 _recipe = '''
-Blah blah
+blah blah
 
 6 cups chicken stock or broth
-2 chicken breasts, finely sliced into ribbons
 1/2 cup couscous
+2 chicken breasts, finely sliced into ribbons
 2 bags baby spinach, washed
 4-5 tablespoons lemon juice
 
 blah blah
 '''
 
-print parse(_recipe)
+assert len(parse(_recipe)) == 5
