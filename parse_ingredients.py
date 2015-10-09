@@ -394,6 +394,4 @@ Blah blah
 
 blah blah
 '''
-print parse(_recipe)
-# TODO
-#assert len(parse_recipe(_recipe)) == 20
+assert len(parse(_recipe)) == 20
