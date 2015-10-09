@@ -38,20 +38,22 @@ $(function() {
   $('#continue').click(function(e) {
     e.preventDefault();
     var formData = new FormData($('#webcam-form')[0]);
-    $.ajax({
+    var a = $.ajax({
       url: '{% url "ocr" %}',  //Server script to process data
       type: 'POST',
       data: formData,
       cache: false,
       contentType: false,
       processData: false
-    }).done(function(result) {
+    });
+    a.done(function(result) {
       console.log(result.data);
       var form = $('<form method="POST" action="{% url "shopping-list" %}">');
       form.append($('<input type="hidden" name="data">').val(JSON.stringify(result.data)));
       $('body').append(form);
       form.submit();
     });
+    a.fail(function() {$('.close').click()});
   });
 });
 </script>
